@@ -1,14 +1,30 @@
-# INSERT PROJECT NAME HERE - Maybe CLOUDQ
+# CLOUDQ
 
+( Work in Progress....)
 
-This is a high performance restful json web queue system.
+## What is this?
 
-You can add plugins using rack middleware.
+This is a high performance restful json web queue system implemented in
+ruby.
+
+## Why?
+
+We looked for remote broker queue implementations for ruby and could not
+find anything that fit our needs, so we decided to take a stab at it.
+Using NoSQL tools like MongoDb and using Async Server tools like Async
+Sinatra seem like the perfect fit for this project.  But we designed the
+model to be implemented in any technology or data store.
 
 # Requirements
 
-redis
+mongodb
 async web server (thin, etc)
+
+# Plugins
+
+You can add plugs for authentication and logging and other great stuff
+through rack middleware.
+
 
 # API
 
@@ -49,6 +65,34 @@ You can create as many queues as you want, when you post your first
 message in the queue, it will create that queue, and when you perform
 reserver, the worker will pull in a first in, first out process.
 
+---
+
+## Publish Job in Ruby
+
+    gem install cloudq_client
+
+    require 'cloudq_client/publish'
+
+    Cloudq::Connection.url = 'http://donuts.com'
+    Cloudq::Publish.job(:make_donuts, 'Donut', :types => [:glazed,
+:chocolate])
+
+
+---
+
+### Worker in Ruby
+
+    gem install cloudq_client
+
+    require 'cloudq_client/cosume'
+    require 'Donut'
+
+    Cloudq::Connection.url = 'http://donuts.com'
+    loop do
+      Cloudq::Consume.job(:make_donuts)
+      sleep 5
+    end
+
 
 ---
 
@@ -59,36 +103,6 @@ pass in arguments to that method for processing:
     klass = Object.const_get(payload[:klass].capitalize)
     klass.perform(*payload[:args])
 
-
-Which means, when you build your remote worker app, you want to use
-event machine to run a periodic timer every xxx seconds:
-
-    EM.do |em|
-      em.add_periodic_timer(3) do
-        payload = Crack::JSON.parse(RestClient.get('/myqueue'))
-        
-        Cloudq::Job.perform(payload)
-        RestClient.delete("/myqueue/#{payload[:id]}")
-      end
-    end
-
-----
-
-# Simple Worker Client
-
-require 'cloudq_worker'
-require 'donuts/bake'
-
-Cloudq::Connection.url = 'http://cloudq.com'
-Cloudq::Job.perform(:make_donuts, 3.seconds)
-
-
-# Simple enqueue Client
-
-require 'cloudq_publisher'
-
-Cloudq::Connection.url = 'http://cloudq.com'
-Cloudq::Job.enqueue(:make_donuts, 'Bake', :type => glazed)
 
 
 ---
