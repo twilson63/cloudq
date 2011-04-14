@@ -10,11 +10,9 @@ require_relative 'job'
 if ENV['MONGOHQ_URL']
   MongoMapper.config = {:production => {'uri' => ENV['MONGOHQ_URL']}}
   MongoMapper.connect(:production)
+else
+  MongoMapper.database = 'cloudq'
 end
-
-
-
-MongoMapper.database = 'cloudq'
 
 class Cloudq < Sinatra::Base
   register Sinatra::Async
