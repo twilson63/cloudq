@@ -9,6 +9,7 @@ require 'uuidtools'
 class Cloudq < Sinatra::Base
   register Sinatra::Async
 
+
   aget '/' do
     body "Welcome to Cloudq"
   end
@@ -20,7 +21,7 @@ class Cloudq < Sinatra::Base
     params['job'] = JSON.parse(data)['job']
     
     # push into redis
-    redis = EM::Protocols::Redis.connect(:host => ENV['REDISTOGO_URL'])
+    redis = EM::Protocols::Redis.connect(:host => 'bass.redistogo.com', :port => 9190, :password => 'a8277b95aef7c8ea46142a757a6f80b6')
     redis.push_head [q,'-',:queued].join(''), params['job'].to_json
 
     body "Success"
@@ -29,7 +30,7 @@ class Cloudq < Sinatra::Base
 
   # Get Job from the Queue
   aget "/:queue" do |q|
-    redis = EM::Protocols::Redis.connect(:host => ENV['REDISTOGO_URL'])
+    redis = EM::Protocols::Redis.connect(:host => 'bass.redistogo.com', :port => 9190, :password => 'a8277b95aef7c8ea46142a757a6f80b6')
     redis.rpop [q,'-',:queued].join('') do |response|
       if response 
         id = UUIDTools::UUID.random_create.to_s 
@@ -45,7 +46,7 @@ class Cloudq < Sinatra::Base
   # Remove Job from the Queue
 
   adelete "/:queue/:id" do |q, id|
-    redis = EM::Protocols::Redis.connect(:host => ENV['REDISTOGO_URL'])
+    redis = EM::Protocols::Redis.connect(:host => 'bass.redistogo.com', :port => 9190, :password => 'a8277b95aef7c8ea46142a757a6f80b6')
     redis.delete id
     body "Success"
   end
