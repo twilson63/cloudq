@@ -1,14 +1,27 @@
+$:.unshift File.join(File.dirname(__FILE__), 'lib')
+
 require 'bundler/setup'
 require 'json'
 require 'sinatra'
 require 'em-redis'
 require 'sinatra/async'
 require 'uuidtools'
+require 'uri'
+require 'rack/params'
+
 
 
 class Cloudq < Sinatra::Base
   register Sinatra::Async
 
+  use Rack::Params
+
+  def redis
+    @redis ||= (
+      uri = URI(ENV['REDISTOGO'] || 'redis://127.0.0.1/')
+      EM::Protocols::Redis.connect(:host => uri.host, :port => uri.port, :password => uri.password)
+    )
+  end
 
   aget '/' do
     body "Welcome to Cloudq"
@@ -16,29 +29,23 @@ class Cloudq < Sinatra::Base
 
   # Post Job to the Queue
   apost "/:queue" do |q|
-    # parse data from json
-    data = request.body.read.to_s
-    params['job'] = JSON.parse(data)['job']
-    
-    # push into redis
-    redis = EM::Protocols::Redis.connect(:host => 'bass.redistogo.com', :port => 9190, :password => 'a8277b95aef7c8ea46142a757a6f80b6')
-    redis.push_head [q,'-',:queued].join(''), params['job'].to_json
-
-    body "Success"
+    redis.push_head queue(q), env['params']['job'].to_json
+    result = { :status => "success" }.to_json
+    body result
   end
 
 
   # Get Job from the Queue
   aget "/:queue" do |q|
-    redis = EM::Protocols::Redis.connect(:host => 'bass.redistogo.com', :port => 9190, :password => 'a8277b95aef7c8ea46142a757a6f80b6')
-    redis.rpop [q,'-',:queued].join('') do |response|
+    redis.pop_tail(queue(q)) do |response|
       if response 
         id = UUIDTools::UUID.random_create.to_s 
         job = JSON.parse(response).merge(:id => id)
         redis.set id, job
         body job.to_json
       else
-        body "empty"
+        result = { :status => :empty }.to_json
+        body result
       end
     end
   end
@@ -46,9 +53,13 @@ class Cloudq < Sinatra::Base
   # Remove Job from the Queue
 
   adelete "/:queue/:id" do |q, id|
-    redis = EM::Protocols::Redis.connect(:host => 'bass.redistogo.com', :port => 9190, :password => 'a8277b95aef7c8ea46142a757a6f80b6')
     redis.delete id
-    body "Success"
+    result = { :status => :success }.to_json
+    body result
+  end
+
+  def queue(name)
+    [name,'-',:queued].join('')
   end
 end
 
