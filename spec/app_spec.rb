@@ -12,7 +12,7 @@ describe 'Cloudq Server Application' do
   # Post Job to Queue
   it 'POST /myqueue' do
     Job.delete_all
-    post '/myqueue', :job => { :klass => 'Archive', :args => {}}
+    post '/myqueue', {:job => { :klass => 'Archive', :args => {}}}.to_json
     last_response.status.should == 200
     Job.count.should == 1
   end

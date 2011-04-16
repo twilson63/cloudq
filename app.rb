@@ -1,18 +1,10 @@
 require 'bundler/setup'
 require 'json'
 require 'sinatra'
-require 'mongo_mapper'
-require 'workflow'
+require 'em-redis'
 require 'sinatra/async'
+require 'uuidtools'
 
-require_relative 'job'
-
-if ENV['MONGOHQ_URL']
-  MongoMapper.config = {:production => {'uri' => ENV['MONGOHQ_URL']}}
-  MongoMapper.connect(:production)
-else
-  MongoMapper.database = 'cloudq'
-end
 
 class Cloudq < Sinatra::Base
   register Sinatra::Async
@@ -23,33 +15,38 @@ class Cloudq < Sinatra::Base
 
   # Post Job to the Queue
   apost "/:queue" do |q|
+    # parse data from json
     data = request.body.read.to_s
-    params['job'] = JSON.parse(data)['job'] unless params['job']
-    halt 500 if params["job"].nil?
-    Job.create(params["job"].merge(:queue => q))
+    params['job'] = JSON.parse(data)['job']
+    
+    # push into redis
+    redis = EM::Protocols::Redis.connect
+    redis.push_head [q,'-',:queued].join(''), params['job'].to_json
+
     body "Success"
   end
 
 
   # Get Job from the Queue
   aget "/:queue" do |q|
-    #Job.first.to_json 
-    job = Job.where(:queue => q.to_sym, :workflow_state => :queued).first
-    if job
-      job.reserve!
-      body job.to_json
-    else
-      body "empty"
+    redis = EM::Protocols::Redis.connect
+    redis.rpop [q,'-',:queued].join('') do |response|
+      if response 
+        id = UUIDTools::UUID.random_create.to_s 
+        job = JSON.parse(response).merge(:id => id)
+        redis.set id, job
+        body job.to_json
+      else
+        body "empty"
+      end
     end
-
   end
 
   # Remove Job from the Queue
 
   adelete "/:queue/:id" do |q, id|
-    job = Job.where(:queue => q.to_sym, :id => id).first
-    halt 404 unless job
-    job.delete!
+    redis = EM::Protocols::Redis.connect
+    redis.delete id
     body "Success"
   end
 end
