@@ -17,10 +17,10 @@ class Cloudq < Sinatra::Base
   use Rack::Params
 
   def redis
-#    @redis ||= (
+    @redis ||= (
       uri = URI(ENV['REDISTOGO_URL'] || 'redis://127.0.0.1/')
       EM::Protocols::Redis.connect(:host => uri.host, :port => uri.port, :password => uri.password)
-#    )
+    )
   end
 
   aget '/' do
@@ -29,9 +29,10 @@ class Cloudq < Sinatra::Base
 
   # Post Job to the Queue
   apost "/:queue" do |q|
-    redis.push_head queue(q), env['params']['job'].to_json
-    result = { :status => "success" }.to_json
-    body result
+    redis.push_head queue(q), env['params']['job'].to_json do
+      result = { :status => "success" }.to_json
+      body result
+    end
   end
 
 
