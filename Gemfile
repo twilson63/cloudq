@@ -2,13 +2,16 @@ source :rubygems
 
 gem 'thin'
 gem 'sinatra'
-gem 'em-redis'
+gem 'bson_ext'
+gem 'mongo_mapper'
 gem 'eventmachine', '1.0.0.beta.3'
 gem 'async_sinatra'
-gem 'uuidtools'
+gem 'workflow'
 
-gem 'rspec'
-gem 'rack-test'
+group :development, :test do
+  gem 'rspec'
+  gem 'rack-test'
+end
 
 
 

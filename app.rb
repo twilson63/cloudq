@@ -3,12 +3,17 @@ $:.unshift File.join(File.dirname(__FILE__), 'lib')
 require 'bundler/setup'
 require 'json'
 require 'sinatra'
-require 'em-redis'
 require 'sinatra/async'
-require 'uuidtools'
-require 'uri'
+require 'workflow'
+require 'job'
 require 'rack/params'
 
+if ENV['MONGOHQ_URL']
+  MongoMapper.config = {:production => {'uri' => ENV['MONGOHQ_URL']}}
+  MongoMapper.connect(:production)
+else
+  MongoMapper.database = 'cloudq'
+end
 
 
 class Cloudq < Sinatra::Base
@@ -16,52 +21,37 @@ class Cloudq < Sinatra::Base
 
   use Rack::Params
 
-  def redis
-    @redis ||= (
-      uri = URI(ENV['REDISTOGO_URL'] || 'redis://127.0.0.1/')
-      EM::Protocols::Redis.connect(:host => uri.host, :port => uri.port, :password => uri.password)
-    )
-  end
-
   aget '/' do
     body "Welcome to Cloudq"
   end
 
   # Post Job to the Queue
   apost "/:queue" do |q|
-    redis.push_head queue(q), env['params']['job'].to_json do
-      result = { :status => "success" }.to_json
-      body result
-    end
+    halt 500 if params["job"].nil?
+    Job.create(params["job"].merge(:queue => q))
+    body { :status => "success" }.to_json
   end
 
 
   # Get Job from the Queue
   aget "/:queue" do |q|
-    redis.pop_tail(queue(q)) do |response|
-      if response 
-        id = UUIDTools::UUID.random_create.to_s 
-        job = JSON.parse(response).merge(:id => id)
-        redis.set id, job
-        body job.to_json
-      else
-        result = { :status => :empty }.to_json
-        body result
-      end
+    job = Job.where(:queue => q.to_sym, :workflow_state => :queued).first
+    if job
+      job.reserve!
+      body job.to_json
+    else
+      body { :status => :empty }.to_json
     end
   end
 
   # Remove Job from the Queue
 
   adelete "/:queue/:id" do |q, id|
-    redis.delete id do
-      result = { :status => :success }.to_json
-      body result
-    end
+    job = Job.where(:queue => q.to_sym, :id => id).first
+    halt 404 unless job
+    job.delete!
+    body { :status => "success" }.to_json
   end
 
-  def queue(name)
-    [name,'-',:queued].join('')
-  end
 end
 
