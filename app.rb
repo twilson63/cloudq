@@ -54,9 +54,10 @@ class Cloudq < Sinatra::Base
   # Remove Job from the Queue
 
   adelete "/:queue/:id" do |q, id|
-    redis.delete id
-    result = { :status => :success }.to_json
-    body result
+    redis.delete id do
+      result = { :status => :success }.to_json
+      body result
+    end
   end
 
   def queue(name)
