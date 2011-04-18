@@ -18,7 +18,7 @@ class Cloudq < Sinatra::Base
 
   def redis
     @redis ||= (
-      uri = URI(ENV['REDISTOGO'] || 'redis://127.0.0.1/')
+      uri = URI(ENV['REDISTOGO_URL'] || 'redis://127.0.0.1/')
       EM::Protocols::Redis.connect(:host => uri.host, :port => uri.port, :password => uri.password)
     )
   end
