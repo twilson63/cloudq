@@ -29,7 +29,8 @@ class Cloudq < Sinatra::Base
   apost "/:queue" do |q|
     halt 500 if params["job"].nil?
     Job.create(params["job"].merge(:queue => q))
-    body { :status => "success" }.to_json
+    status = { :status => "success" }.to_json
+    body status
   end
 
 
@@ -40,7 +41,8 @@ class Cloudq < Sinatra::Base
       job.reserve!
       body job.to_json
     else
-      body { :status => :empty }.to_json
+      status = { :status => :empty }.to_json
+      body status
     end
   end
 
@@ -50,7 +52,8 @@ class Cloudq < Sinatra::Base
     job = Job.where(:queue => q.to_sym, :id => id).first
     halt 404 unless job
     job.delete!
-    body { :status => "success" }.to_json
+    status = { :status => "success" }.to_json
+    body status
   end
 
 end
