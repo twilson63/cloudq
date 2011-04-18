@@ -43,6 +43,7 @@ GEM
       eventmachine (>= 0.12.6)
       rack (>= 1.0.0)
     tilt (1.2.2)
+    workflow (0.8.0)
 
 PLATFORMS
   ruby
@@ -56,3 +57,4 @@ DEPENDENCIES
   rspec
   sinatra
   thin
+  workflow
