@@ -1,3 +1,16 @@
+PATH
+  remote: .
+  specs:
+    cloudq (0.0.6)
+      async_sinatra
+      bson_ext
+      bundler
+      eventmachine (>= 1.0.0.beta.3)
+      mongo_mapper
+      sinatra
+      thin
+      workflow
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -49,12 +62,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  async_sinatra
-  bson_ext
-  eventmachine (= 1.0.0.beta.3)
-  mongo_mapper
+  cloudq!
   rack-test
-  rspec
-  sinatra
-  thin
-  workflow
+  rspec (>= 2.5.0)

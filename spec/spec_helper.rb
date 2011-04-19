@@ -1,20 +1,13 @@
-$:.unshift(File.join(File.dirname(__FILE__), '..'))
+$:.unshift(File.join(File.dirname(__FILE__), '..','lib'))
 
-require 'app'
-require 'sinatra/async/test'
-require 'test/unit'
+require 'cloudq'
 require 'rack/test'
 
 RSpec.configure do
-  include Rack::Test::Methods
-  include Sinatra::Async::Test::Methods
-  include Test::Unit::Assertions
+#  include Rack::Test::Methods
 
 end
 
-def app
-  Cloudq
-end
 
 
 

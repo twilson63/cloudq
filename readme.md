@@ -1,29 +1,85 @@
-# CLOUDQ
+# Cloudq Framework
 
-( Work in Progress....)
+Cloudq is a rack-based job queue framework.  
 
-## What is this?
+## What does that mean?
 
-This is a high performance restful json web queue system implemented in
-ruby.
+Cloudq is a job queue, but instead of containing a ton of features, it focuses on doing job queue basics:
 
-## Why?
+* Publish a Job to a Queue
+* Reserve a Job from a Queue
+* Delete a Job from a Queue
 
-We looked for remote broker queue implementations for ruby and could not
-find anything that fit our needs, so we decided to take a stab at it.
-Using NoSQL tools like MongoDb and using Async Server tools like Async
-Sinatra seem like the perfect fit for this project.  But we designed the
-model to be implemented in any technology or data store.
+Using the rack application architecture, and taking advantage of rack middleware, adding features or embedding
+into other applications is very easy.
 
-# Requirements
+Currently, it does depend on access to a mongodb datastore.  Either the standard localhost or you can 
+set the MONGOHQ_URL env variable.  This does not mean that any application you join with Cloudq needs to write to mongodb, just the job queue is connected to mongo.
 
-mongodb
-async web server (thin, etc)
+# What about security?
+# What about monitoring?
+# etc???
 
-# Plugins
+The answer is simple, RACK MIDDLEWARE!  If you want to implement ssl encryption and enforce SSL traffic, use
+rack middleware.  If you want to attach a slick admin 
+interface that monitors your queues, then use the rack
+map function to attach another rack-based application to your config.ru file.
 
-You can add plugs for authentication and logging and other great stuff
-through rack middleware.
+It really is that easy, and Cloudq gives you the flexibility to integrate almast anyway you can think of.
+
+# How do I get started?
+
+1. Install Mongodb
+
+First you need to install MongoDb and have a mongodb service running.  Or you can signup for a free account on
+MongoHq.com.  
+
+2. Install Ruby version 1.9.2 or above
+
+Make sure you have Ruby 1.9.2 installed on your machine, if you do not have 1.9.2, check out [RVM](https://rvm.beginrescueend.com/).  Ruby 1.9.2 comes with rubygems, which will allow you to install the cloudq gem.
+
+3. Install the Cloudq Gem
+
+    gem install cloudq
+    
+4. Build your cloudq server
+
+    cloudq [your name]
+    
+This will create a directory and add a config.ru and Gemfile.  And if you don't want to add any other features,
+you are good to go.  All you have to do is cd into your directory and run:
+
+
+    thin start
+    
+And your cloudq server is up and running!  
+
+----------------
+
+# Deploy
+
+You can deploy Cloudq just like any rails application, but Heroku is an awesome platform to deploy:
+    
+    # make sure you have your project in a git repo
+    
+    git init
+    git add .
+    git commit -am "First Commit"
+    
+    # deploy to heroku in 2 simple steps
+    
+    heroku create
+    git push heroku master
+    
+
+# Contribution
+
+Feel free to for fork the code and make pull requests.. But also create some Rack Middleware that helps add an
+awesome feature stack to the Cloudq.
+
+Here is a link to an awesome chapter in the Rails 3 in a Nutshell on Rack.
+
+[http://rails-nutshell.labs.oreilly.com/ch07.html](http://rails-nutshell.labs.oreilly.com/ch07.html)
 
 
 # API

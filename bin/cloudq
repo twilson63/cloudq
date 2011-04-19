@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+
+require File.join(File.dirname(__FILE__), '..','lib', 'cloudq')
+
+require 'fileutils'
+
+if ARGV.first
+  project = ARGV.first
+  FileUtils.mkdir_p project
+
+  config_ru = ["require 'cloudq'", "run Cloudq::App"].join("\n")
+  File.open(File.join(project, 'config.ru'),'w').write(config_ru)
+  gemfile = ['source :rubygems', "gem 'thin'", "gem 'cloudq'"].join("\n")
+  File.open(File.join(project, 'Gemfile'),'w').write(gemfile)
+  puts "****** Sucessfully Created #{project} *******"
+else
+  puts "Cloudq Remote Job Queue Framework..."
+  puts "(Please supply a project name for your cloudq server...)"
+end
+# puts "Running Cloudq on port:9292"
+# puts "Press Ctrl-C to exit"
+# # try to run in current directory
+# gem 'rack', '>=0'
+# load Gem.bin_path('rack', 'rackup', version)
