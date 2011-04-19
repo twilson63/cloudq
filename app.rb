@@ -2,9 +2,11 @@ $:.unshift File.join(File.dirname(__FILE__), 'lib')
 
 require 'bundler/setup'
 require 'json'
+require 'mongo_mapper'
 require 'sinatra'
 require 'sinatra/async'
 require 'workflow'
+
 require 'job'
 require 'rack/params'
 

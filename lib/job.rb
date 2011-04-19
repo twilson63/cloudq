@@ -1,3 +1,4 @@
+
 class Job
   include MongoMapper::Document
   before_validation :write_initial_state, :on => :create
