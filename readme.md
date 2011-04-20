@@ -130,13 +130,18 @@ reserver, the worker will pull in a first in, first out process.
 
 ## Publish Job in Ruby
 
-    gem install cloudq_client
+```
+gem install cloudq_client
+```
 
-    require 'cloudq_client/publish'
+``` ruby
+require 'cloudq_client/publish'
 
-    Cloudq::Connection.url = 'http://donuts.com'
-    Cloudq::Publish.job(:make_donuts, 'Donut', :types => [:glazed,
+Cloudq::Connection.url = 'http://donuts.com'
+Cloudq::Publish.new(:make_donuts).job('Donut', :types => [:glazed,
 :chocolate])
+
+```
 
 
 ---
