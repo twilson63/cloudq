@@ -40,9 +40,9 @@ Make sure you have Ruby 1.9.2 installed on your machine, if you do not have 1.9.
 
 3. Install the Cloudq Gem
 
-''' bash
+``` bash
 gem install cloudq
-'''
+```
 
     
 4. Build your cloudq server
