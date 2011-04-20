@@ -2,10 +2,11 @@
 lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)
 
+require 'cloudq/version'
 
 Gem::Specification.new do |s|
   s.name        = "cloudq"
-  s.version     = "0.0.6"
+  s.version     = Cloudq::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Tom Wilson"]
   s.email       = ["tom@jackhq.com"]

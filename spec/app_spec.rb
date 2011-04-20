@@ -1,10 +1,12 @@
 require 'spec_helper'
-require 'sinatra/async/test'
+
 require 'test/unit'
+require 'sinatra/async/test'
 
 describe 'Cloudq Server Application' do
+ include Test::Unit::Assertions
+
   include Sinatra::Async::Test::Methods
-  include Test::Unit::Assertions
 
   def app
     Cloudq::App

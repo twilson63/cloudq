@@ -23,11 +23,9 @@ module Cloudq
       state :queued do
         event :reserve, :transitions_to => :reserved
       end
-
       state :reserved do
         event :delete, :transitions_to => :deleted
       end
-
       state :deleted
     end
 
