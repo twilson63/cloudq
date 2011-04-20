@@ -47,7 +47,9 @@ gem install cloudq
     
 4. Build your cloudq server
 
-    cloudq [your name]
+```
+cloudq [your name]
+```
     
 This will create a directory and add a config.ru and Gemfile.  And if you don't want to add any other features,
 you are good to go.  All you have to do is cd into your directory and run:
