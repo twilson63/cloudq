@@ -12,7 +12,7 @@ module Cloudq
 
     key :queue, String
     key :klass, String
-    key :args, Hash
+    key :args, Array 
     key :workflow_state, String
 
     timestamps!

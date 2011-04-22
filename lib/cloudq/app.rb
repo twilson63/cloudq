@@ -5,7 +5,7 @@ module Cloudq
     use Rack::Params
 
     def self.version
-      "0.0.6"
+      "0.0.8"
     end
 
     aget '/' do
@@ -14,8 +14,9 @@ module Cloudq
 
     # Post Job to the Queue
     apost "/:queue" do |q|
-      halt 500 if params["job"].nil?
-      Job.create(params["job"].merge(:queue => q))
+      # Rack::Params set env['params'] not params
+      halt 500 if env["params"]["job"].nil?
+      Job.create(env["params"]["job"].merge(:queue => q))
       status = { :status => "success" }.to_json
       body status
     end

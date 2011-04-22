@@ -18,6 +18,7 @@ module Rack
 
     def call(env)
       env['params'] = retrieve_params(env)
+      
       @app.call(env)
     end
 

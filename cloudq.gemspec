@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = ">= 1.3.6"
   s.add_development_dependency "rspec", ">= 2.5.0"
   s.add_development_dependency "rack-test", ">= 0"
+  s.add_development_dependency "rest-client", ">= 0"
 
   s.add_dependency "bundler", ">= 0"
   s.add_dependency "thin", ">= 0"
