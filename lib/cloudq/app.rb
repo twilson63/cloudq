@@ -11,6 +11,10 @@ module Cloudq
     aget '/' do
       body "Welcome to Cloudq Framework"
     end
+    
+    aget '/mu-8a96bb28-3144ff61-26ebfcaf-2d0f9b36' do
+      '42'
+    end
 
     # Post Job to the Queue
     apost "/:queue" do |q|
